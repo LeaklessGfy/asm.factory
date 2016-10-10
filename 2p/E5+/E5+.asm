@@ -1,59 +1,55 @@
 ; Auteurs : Rasquier Vincent
-; Date de creation : ---
-; Objectif : Exercice 5
+; Date de creation : 10/10
+; Objectif : [TP2] Exercice 5+ - is divisible plus ?
 
 %include "asm_io.inc"
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;; Section de donnees ;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .data
 yes: db "Oui", 0
 no: db "Non", 0
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;; Section de reservation ;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; BSS ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .bss
 a: resd 1
 b: resd 1
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;; Section de code ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; CODE ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .text
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 global main
 main:
 	call read_int
 	mov [a], eax
+
 	call read_int
 	mov [b], eax
-	
+
+	;Init div
 	mov edx, 0
 	mov eax, [a]
+	mov ecx, [b]
 	cdq
 
-	mov ecx, [b]
 	idiv ecx
-	
+
 	cmp edx, 0
-	je divisible
-	
+	je is_divisible
+
+	;Is not divisible
 	mov eax, no
 	call print_string
 	call print_espace
 
 	mov eax, edx
 	call print_int
-	jmp end
-	
-	divisible:
+	jmp clean
+
+	is_divisible:
 		mov eax, yes
 		call print_string
-    	end:
+	clean:
 		call print_nl
+	exit:
     		mov ebx, 0
     		mov eax, 1
     		int 0x80
