@@ -1,0 +1,27 @@
+     1                                  SECTION .data
+     2                                  debut :
+     3 00000000 4C65207072656D6965-         db "Le premier TP "
+     4 00000009 7220545020         
+     5                                  fin :
+     6 0000000E 657374207072657371-         db "est presque termine !", 10
+     7 00000017 7565207465726D696E-
+     8 00000020 6520210A           
+     9                                  
+    10                                  SECTION .text
+    11                                  global main
+    12                                  main :
+    13 00000000 BA0E000000                  mov edx, 14
+    14 00000005 B9[00000000]                mov ecx, debut
+    15 0000000A BB01000000                  mov ebx, 1
+    16                                  
+    17 0000000F B804000000                  mov eax, 4
+    18 00000014 CD80                        int 0x80
+    19                                  
+    20 00000016 BA16000000                  mov edx, 22
+    21 0000001B B9[0E000000]                mov ecx, fin
+    22 00000020 B804000000                  mov eax, 4
+    23 00000025 CD80                        int 0x80
+    24                                  
+    25 00000027 BB00000000                  mov ebx, 0
+    26 0000002C B801000000                  mov eax, 1
+    27 00000031 CD80                        int 0x80
