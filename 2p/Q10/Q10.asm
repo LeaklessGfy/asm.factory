@@ -1,47 +1,66 @@
 ; Auteurs : Rasquier Vincent
-; Date de creation : 10/09
-; Objectif : Exercice 10
+; Date de creation : 10/10
+; Objectif : [TP2] Exercice 10 - sort number not in list
 
 %include "asm_io.inc"
+%define LENGTH 51
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;; Section de donnees ;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .data
+	prompt: db "Entrez un nombre: ", 0
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;; Section de reservation ;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; BSS ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .bss
-input: resb 51
+	inputs: resb 51
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;; Section de code ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; CODE ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .text
+get_input:
+	mov eax, prompt
+	call print_string
+	mov eax, 0
+	call read_int
+	ret
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 global main
 main:
-	get_input:
-		call read_int
-		
-		;If eax == -1 jump to order
-		cmp eax, -1
-		je order
-		
-		;Get i in order to init bit
-		mov ebx, eax
-		sub ebx, 1
-		
-		;Init
-		mov [input + (ebx * 2)], 1
+	mov ebx, 0 ;Input counter
+	mov ecx, -1 ;Output counter
+
+process:
+	call get_input
 	
-		;loop back
-		jmp get_input
-	order:
-		
-	end:
-    		mov ebx, 0
-   		mov eax, 1
-    		int 0x80
+	cmp eax, -1
+	je result
+
+	mov byte [inputs + eax], 1
+
+	add ebx, 1
+	cmp ebx, LENGTH
+	je result
+
+	jmp process
+
+result:
+	add ecx, 1
+	cmp ecx, LENGTH
+	je clean
+	
+	mov bl, [inputs + ecx]
+	
+	cmp bl, 1
+	je result
+	
+	mov eax, ecx
+	call print_int
+	call print_espace
+	
+	jmp result
+
+clean:
+	call print_nl
+
+exit:
+	mov ebx, 0
+	mov eax, 1
+	int 0x80
