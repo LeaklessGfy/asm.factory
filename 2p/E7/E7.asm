@@ -26,7 +26,7 @@ global main
 main:
 	call init
 	mov ebx, [input]
-	mov ecx, 32
+	mov ecx, LENGTH
 
 process_1:
 	shl ebx, 1
@@ -47,8 +47,7 @@ process_2:
 	;Loop processing
 	sub ecx, 1
 	cmp ecx, 0
-	je clean
-	jmp process_1
+	jne process_1
 
 clean:
 	call print_nl
