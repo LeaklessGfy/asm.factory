@@ -11,6 +11,7 @@ SECTION .data
 ;;;;;;;;;;;;;;;;;;;;;;;;;; BSS ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .bss
 	input: resd 1
+	esp_init_state: resd 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; CODE ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .text
@@ -32,8 +33,8 @@ divide:
 global main
 main:
 	call init
-	mov ebx, 0 ;Compteur
-	mov ecx, eax ;Set diviseur
+	mov [esp_init_state], esp
+	mov ecx, eax ;Set diviseur (itself at first round)
 
 process:
 	call divide
@@ -42,26 +43,24 @@ process:
 	je is_divisible
 
 process_2:
-	sub ecx, 1
-	cmp ecx, 0
+	sub ecx, 1 ;Sub diviseur by one
+	cmp ecx, 0 ;Check if diviseur == 0 (avoid /0)
 	je result
 
 	jmp process
 
 is_divisible:
-	push ecx
-	add ebx, 1
+	push ecx ;Push val of diviseur inside pile
 	jmp process_2
 
 result:
-	cmp ebx, 0
+	cmp esp, [esp_init_state] ;If esp == his init state, exit
 	je clean
 
 	pop eax
 	call print_int
 	call print_espace
 
-	sub ebx, 1
 	jmp result
 
 clean:
