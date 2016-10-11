@@ -42,65 +42,77 @@ p_process:
 p_return:
 	ret
 
+;puissance case 0
 p_0:
 	mov eax, 1
 	ret
 
 global main
 main:
-	mov ecx, 0 ;Counter
-	mov edx, 0 ;Register that containt inputs
+	mov ecx, 0 ;Init counter
+	mov edx, 0 ;Register that containt user's inputs
 
 process:
+	;Get one input (int)
 	call get_input
 
-	;If input == -1 proceed result	
+	;#If input == -1 : Proceed result
 	cmp eax, -1
 	je result
 
-	;Save input in ebx, init eax to 2 (for puissance)
+	;#Else : Save input in ebx, init eax to 2 (for puissance)
 	mov ebx, eax
-	mov eax, 2
-
-	;If input == 1
-	cmp ebx, 1
-	je process_add
 
 	;Calculate puissance
 	call get_puissance
 
 process_add:
+	;Add result of puissance to edx
 	add edx, eax
+
+	;Add 1 to counter
 	add ecx, 1
 
-	;If ecx == max length, get result
+	;#If ecx == max length : Proceed result
 	cmp ecx, LENGTH
 	je result
 
+	;#Else = Return in loop
 	jmp process
 
 result:
-	mov ecx, -1
+	mov ecx, -1 ;Init counter
 
 result_loop:
+	;Increment counter
 	add ecx, 1
+
+	;#If counter == max length : End of program
 	cmp ecx, LENGTH
 	je clean
 
+	;Put in ebx value of counter
 	mov ebx, ecx
 
+	;Get puissance (2 ^ ebx)
 	call get_puissance
-	
+
+	;Mov result in ebx
 	mov ebx, eax
+
+	;Proceed 'and'
 	and eax, edx
-	
+
+	;#If 'and' result == puissance : Don't show the number
 	cmp eax, ebx
 	je result_loop
-	
+
+	;#Else: Print the number on screen
 	mov eax, ecx
 	call print_int
 	call print_espace
-	
+
+	;Loop
 	jmp result_loop
 
 clean:
