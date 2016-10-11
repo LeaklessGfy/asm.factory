@@ -1,56 +1,59 @@
 ; Auteurs : Rasquier Vincent
-; Date de creation : 10/09
-; Objectif : Exercice 7
+; Date de creation : 10/10
+; Objectif : [TP2] Exercice 7 - binary dump
 
 %include "asm_io.inc"
+%define LENGTH 32
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;; Section de donnees ;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .data
+	prompt: db "Entrez un nombre: ", 0
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;; Section de reservation ;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; BSS ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .bss
+	input: resd 1
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;; Section de code ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; CODE ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .text
+init:
+	mov eax, prompt
+	call print_string
+	call read_int
+	mov [input], eax
+	ret
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 global main
 main:
-	;Init ecx to 32
+	call init
+	mov ebx, [input]
 	mov ecx, 32
-	
-	;Get an integer
-	call read_int
 
-	;Save input inside ebx
-	mov ebx, eax
+process_1:
+	shl ebx, 1
 
-	loop:
-		shl ebx, 1
-	
-		;If flag CF is 0 jump
-		jnc write_zero
-		
-		mov eax, 1
-		jmp writer	
+	;If flag CF is 0, dump 0
+	jnc is_zero
 
-		write_zero:
-			mov eax, 0
-	
-	writer:
-		call print_int
-		sub ecx, 1
-		cmp ecx, 0
-		jne loop
+is_not_zero:
+	mov eax, 1
+	jmp process_2
 
-	end:
-		call print_nl
-    		mov ebx, 0
-    		mov eax, 1
-    		int 0x80
+is_zero:
+	mov eax, 0
+
+process_2:
+	call print_int
+
+	;Loop processing
+	sub ecx, 1
+	cmp ecx, 0
+	je clean
+	jmp process_1
+
+clean:
+	call print_nl
+
+exit:
+	mov ebx, 0
+	mov eax, 1
+	int 0x80
