@@ -1,48 +1,49 @@
 ; Auteurs : Rasquier Vincent
-; Date de creation : 10/09
-; Objectif : Exercice 9
+; Date de creation : 10/10
+; Objectif : [TP2] Exercice 9 - binary dump number of one (improve)
 
 %include "asm_io.inc"
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;; Section de donnees ;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .data
+	prompt: db "Entrez un nombre: ", 0
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;; Section de reservation ;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; BSS ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .bss
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;; Section de code ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; CODE ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .text
+init:
+	mov eax, prompt
+	call print_string
+	call read_int
+	ret
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 global main
 main:
-	mov ecx, 1
+	call init
+	mov ecx, 0
 
-	;Read int from console
-	call read_int
-	
-	loop:
-		mov ebx, eax
-		sub ebx, 1
-		and eax, ebx
-		
-		cmp eax, 0
-		je end
-		
-		add ecx, 1
-		jmp loop	
+process:
+	mov ebx, eax
 
-	end:
-		mov eax, ecx
-		call print_int	
-		call print_nl
-   		
-		mov ebx, 0
-    		mov eax, 1
-    		int 0x80
+	cmp eax, 0
+	je result
+
+	add ecx, 1
+	sub ebx, 1
+	and eax, ebx
+
+	jmp process
+
+result:
+	mov eax, ecx
+	call print_int
+
+clean:
+	call print_nl
+
+exit:
+	mov ebx, 0
+	mov eax, 1
+	int 0x80

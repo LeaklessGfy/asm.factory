@@ -1,6 +1,6 @@
 ; Auteurs : Rasquier Vincent
 ; Date de creation : 10/10
-; Objectif : [TP2] Exercice 7 - binary dump
+; Objectif : [TP2] Exercice 8 - binary dump number of one
 
 %include "asm_io.inc"
 %define LENGTH 32
