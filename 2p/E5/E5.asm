@@ -6,49 +6,65 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .data
-yes: db "Oui", 0
-no: db "Non", 0
+	prompt1: db "Entrez un nombre: ", 0
+	prompt2: db "Un autre nombre: ", 0
+	yes: db "Oui", 0
+	no: db "Non", 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; BSS ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .bss
-a: resd 1
-b: resd 1
+	input1: resd 1
+	input2: resd 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; CODE ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .text
-global main
-main:
+init:
+	mov eax, prompt1
+	call print_string
 	call read_int
-	mov [a], eax
+	mov [input1], eax
 
+	mov eax, prompt2
+	call print_string
 	call read_int
-	mov [b], eax
+	mov [input2], eax
+	ret
 
-	;Init div
+divide:
 	mov edx, 0
-	mov eax, [a]
-	mov ecx, [b]
+	mov eax, [input1]
+	mov ecx, [input2]
 
 	div ecx
+	ret
 
+global main
+main:
+	call init
+	call divide
+
+	;Compare rest and 0
 	cmp edx, 0
-	je is_divisible
 
-	;Is not divisible
+	jne is_not_divisible
+
+is_divisible:
+	mov eax, yes
+	call print_string
+	jmp clean
+
+is_not_divisible:
 	mov eax, no
 	call print_string
 	call print_espace
 
 	mov eax, edx
 	call print_int
-	jmp clean
 
-	is_divisible:
-		mov eax, yes
-		call print_string
-	clean:
-		call print_nl
-	exit:
-    		mov ebx, 0
-    		mov eax, 1
-    		int 0x80
+clean:
+	call print_nl
+
+exit:
+	mov ebx, 0
+	mov eax, 1
+	int 0x80
