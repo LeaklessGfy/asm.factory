@@ -6,35 +6,49 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .data
+	prompt1: db "Entrez un nombre: ", 0
+	prompt2: db "Un autre nombre: ", 0
+	result: db "Le nombre le plus grand est: ", 0 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; BSS ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .bss
-	input: resd 1
+	input1: resd 1
+	input2: resd 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; CODE ;;;;;;;;;;;;;;;;;;;;;;;;;;
 SECTION .text
+init:
+	mov eax, prompt1
+	call print_string
+	call read_int
+	mov [input1], eax
+
+	mov eax, prompt2
+	call print_string
+	call read_int
+	mov [input2], eax
+	ret
+
 global main
 main:
-	;Read first int and put it in #input
-	call read_int
-	mov [input], eax
+	call init
+	mov ecx, [input2]
 
-	;Read second int
-	call read_int
+	;Compare #input2 to #input1
+	cmp eax, [input1]
 
-	;Compare eax(second int) to #input (first int)
-	cmp eax, [input]
-	
-	;If eax > #input skip to writer. 
-	;Else put #input in eax
 	jg write
-	mov eax, [input]
-	
-	write:
-	   	call print_int
-		call print_nl
+	mov ecx, [input1]
 
-	exit:
-    		mov ebx, 0
-    		mov eax, 1
-    		int 0x80
+write:
+	mov eax, result
+	call print_string
+
+	mov eax, ecx
+	call print_int
+	call print_nl
+
+exit:
+	mov ebx, 0
+	mov eax, 1
+	int 0x80
