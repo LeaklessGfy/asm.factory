@@ -43,7 +43,7 @@ process_2:
 	cmp ecx, 0
 	jne process_1
 
-	mov eax, edx,
+	mov eax, edx
 	call print_int
 
 clean:
